@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio OA 10: Variables Aleatorias Finitas</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax CDN para notación matemática LaTeX -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .coin {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .coin.flip {
+            transform: rotateY(720deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col text-lg">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 shadow-lg px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <span class="bg-indigo-600 text-sm font-semibold px-3 py-1 rounded-full uppercase tracking-wider text-indigo-100">Matemática 2° Medio · OA 10</span>
+            <h1 class="text-3xl font-bold text-white mt-1">Laboratorio de Variables Aleatorias Finitas</h1>
+        </div>
+        <!-- Pestañas de Navegación -->
+        <nav class="flex flex-wrap bg-slate-900 p-1 rounded-xl border border-slate-700 gap-1 items-center">
+            <button onclick="switchTab('inicio')" id="btn-inicio" class="px-4 py-2 text-lg font-medium rounded-lg bg-indigo-600 text-white transition">Inicio</button>
+            <button onclick="switchTab('introduccion')" id="btn-introduccion" class="px-4 py-2 text-lg font-medium rounded-lg text-slate-400 hover:text-white transition">Introducción</button>
+            <div class="relative group">
+                <button onclick="switchTab('experimentos')" id="btn-experimentos" class="px-4 py-2 text-lg font-medium rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1">Experimentos ▾</button>
+            </div>
+            <button onclick="switchTab('quiz')" id="btn-quiz" class="px-4 py-2 text-lg font-medium rounded-lg text-slate-400 hover:text-white transition">Quiz Final</button>
+            
+            <!-- Temporizador Visual -->
+            <div id="timer-box" class="ml-auto bg-slate-800 border border-indigo-500/40 text-indigo-300 px-3 py-1.5 rounded-lg text-base font-mono font-bold flex items-center gap-2">
+                ⏱️ <span id="timer-display">08:00</span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Columna Principal: Simulador, Teoría y Quiz -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- PANEL -1: INICIO Y TICKET DE ENTRADA -->
+            <div id="tab-inicio" class="tab-content space-y-6">
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                    <div class="border-b border-slate-700 pb-4">
+                        <span class="text-indigo-400 text-sm font-semibold tracking-wider uppercase">Unidad de Estadística y Probabilidad</span>
+                        <h2 class="text-3xl font-bold text-white mt-1">Inicio de Unidad y Activación Previa (8 minutos)</h2>
+                        <p class="text-lg text-slate-300 mt-2">
+                            Bienvenidos al laboratorio interactivo. Esta primera sección está diseñada para preparar tu mente, consultar dudas con el tutor y establecer el contexto de la clase.
+                        </p>
+                    </div>
+
+                    <!-- Regla de Navegación Explicada -->
+                    <div class="bg-amber-950/40 border border-amber-500/40 rounded-xl p-5 space-y-2">
+                        <h3 class="text-lg font-semibold text-amber-200 flex items-center gap-2">
+                            <span>🧭</span> Instrucciones de Navegación Interactiva
+                        </h3>
+                        <p class="text-base text-slate-300 leading-relaxed">
+                            Por diseño pedagógico, cada etapa cuenta con un tiempo reglamentado. El botón <strong>"Siguiente ➔"</strong> se habilitará únicamente cuando hayas completado al menos el <strong>80% del tiempo</strong> de la pestaña actual. <strong>No es posible regresar a pestañas anteriores</strong> una vez avanzado el proceso, por lo que te invitamos a revisar con calma cada sección antes de continuar.
+                        </p>
+                    </div>
+
+                    <!-- 1. Termómetro de Confianza Inicial -->
+                    <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-3">
+                        <h3 class="text-xl font-semibold text-indigo-300 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-base font-bold">1</span>
+                            Termómetro de Confianza con el Azar
+                        </h3>
+                        <p class="text-lg text-slate-300 leading-relaxed">
+                            ¿Qué tan familiarizado te sientes calculando probabilidades en tu vida cotidiana o académica? Selecciona tu nivel:
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                            <label class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center gap-3 cursor-pointer hover:border-indigo-500 transition">
+                                <input type="radio" name="termometro" class="text-indigo-600 w-5 h-5">
+                                <span class="text-base text-slate-200">🌱 Nivel Bajo (Necesito repasar desde cero)</span>
+                            </label>
+                            <label class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center gap-3 cursor-pointer hover:border-indigo-500 transition">
+                                <input type="radio" name="termometro" class="text-indigo-600 w-5 h-5">
+                                <span class="text-base text-slate-200">🌿 Nivel Medio (Recuerdo conceptos básicos)</span>
+                            </label>
+                            <label class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center gap-3 cursor-pointer hover:border-indigo-500 transition">
+                                <input type="radio" name="termometro" class="text-indigo-600 w-5 h-5">
+                                <span class="text-base text-slate-200">🌳 Nivel Avanzado (Listo para experimentar)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 2. Objetivo de la Sesión -->
+                    <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-3">
+                        <h3 class="text-xl font-semibold text-indigo-300 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-base font-bold">2</span>
+                            Objetivo de la Sesión de Hoy
+                        </h3>
+                        <p class="text-lg text-slate-300 leading-relaxed">
+                            Comprender, analizar y modelar variables aleatorias finitas mediante experimentos estocásticos (monedas, dados y urnas), contrastando la probabilidad teórica con la frecuencia empírica a través de la experimentación activa.
+                        </p>
+                    </div>
+
+                    <!-- 3. Ticket de Entrada ampliado a 5 preguntas -->
+                    <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-4">
+                        <h3 class="text-xl font-semibold text-indigo-300 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-base font-bold">3</span>
+                            Ticket de Entrada (Preguntas Metacognitivas y Previas)
+                        </h3>
+                        <p class="text-lg text-slate-300 leading-relaxed">
+                            Responde las siguientes 5 preguntas reflexivas para activar tus saberes previos antes de iniciar:
+                        </p>
+                        <div class="space-y-4 pt-1">
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-2">
+                                <label class="block text-base font-semibold text-indigo-200">1. ¿Qué significa para ti que un evento dependa del azar en tu vida diaria?</label>
+                                <textarea placeholder="Escribe tu reflexión aquí..." rows="2" class="w-full bg-slate-900 text-white border border-slate-700 rounded-lg p-3 text-base focus:outline-none focus:border-indigo-500"></textarea>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-2">
+                                <label class="block text-base font-semibold text-indigo-200">2. Si juegas con un dado y sale 6 tres veces seguidas, ¿crees que está cargado? Justifica.</label>
+                                <textarea placeholder="Escribe tu razonamiento aquí..." rows="2" class="w-full bg-slate-900 text-white border border-slate-700 rounded-lg p-3 text-base focus:outline-none focus:border-indigo-500"></textarea>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-2">
+                                <label class="block text-base font-semibold text-indigo-200">3. ¿Cómo definirías con tus propias palabras qué es una probabilidad?</label>
+                                <textarea placeholder="Escribe tu definición aquí..." rows="2" class="w-full bg-slate-900 text-white border border-slate-700 rounded-lg p-3 text-base focus:outline-none focus:border-indigo-500"></textarea>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-2">
+                                <label class="block text-base font-semibold text-indigo-200">4. ¿Qué diferencia imaginas que hay entre un resultado teórico y uno experimental?</label>
+                                <textarea placeholder="Escribe tu hipótesis aquí..." rows="2" class="w-full bg-slate-900 text-white border border-slate-700 rounded-lg p-3 text-base focus:outline-none focus:border-indigo-500"></textarea>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-2">
+                                <label class="block text-base font-semibold text-indigo-200">5. ¿Qué esperas aprender o descubrir en este laboratorio interactivo?</label>
+                                <textarea placeholder="Escribe tu expectativa aquí..." rows="2" class="w-full bg-slate-900 text-white border border-slate-700 rounded-lg p-3 text-base focus:outline-none focus:border-indigo-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Transición condicional -->
+                    <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h4 class="text-lg font-semibold text-indigo-200">¿Listo para avanzar?</h4>
+                            <p class="text-base text-slate-300 mt-1">El botón se habilitará cuando transcurra el 80% del tiempo de inicio (6.4 min).</p>
+                        </div>
+                        <button id="btn-siguiente-inicio" onclick="switchTab('introduccion')" disabled class="bg-slate-700 text-slate-400 font-medium px-6 py-3 rounded-xl text-lg transition shadow-lg shrink-0 cursor-not-allowed">
+                            Siguiente ➔ (Esperando 80% del tiempo)
+                        </button>
+                    </div>
+
+                    <!-- Acceso para el Docente al final de la página de Inicio -->
+                    <div class="pt-4 border-t border-slate-700 flex justify-end">
+                        <button onclick="abrirModalDocente()" class="bg-slate-700 hover:bg-slate-600 text-indigo-300 border border-indigo-500/30 px-4 py-2.5 rounded-xl text-base font-medium transition flex items-center gap-2">
+                            🔒 Acceso Docente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL 0: INTRODUCCIÓN Y TEORÍA -->
+            <div id="tab-introduccion" class="tab-content hidden space-y-6">
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                    <div class="border-b border-slate-700 pb-4">
+                        <span class="text-indigo-400 text-sm font-semibold tracking-wider uppercase">Módulo de Contextualización (10 minutos)</span>
+                        <h2 class="text-3xl font-bold text-white mt-1">Fundamentos de Probabilidad y Variables Aleatorias</h2>
+                        <p class="text-lg text-slate-300 mt-2">
+                            Antes de experimentar con modelos estocásticos, es fundamental comprender cómo medimos la incertidumbre a través de ejemplos visuales interactivos y retos analíticos.
+                        </p>
+                    </div>
+
+                    <!-- 1. ¿Qué es una probabilidad? -->
+                    <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-3">
+                        <h3 class="text-xl font-semibold text-indigo-300 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-base font-bold">1</span>
+                            ¿Qué es una Probabilidad?
+                        </h3>
+                        <p class="text-lg text-slate-300 leading-relaxed">
+                            La probabilidad es un número entre \(0\) y \(1\) (o de \(0\%\) a \(100\%\)) que mide el grado de certeza de que ocurra un evento determinado en un experimento aleatorio.
+                        </p>
+                    </div>
+
+                    <!-- 2. ¿Cómo se calcula? -->
+                    <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-3">
+                        <h3 class="text-xl font-semibold text-indigo-300 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-base font-bold">2</span>
+                            ¿Cómo se Calcula? (Regla de Laplace)
+                        </h3>
+                        <div class="bg-slate-800 p-5 rounded-xl text-center border border-slate-700">
+                            <div class="text-2xl text-emerald-400 font-mono">
+                                \[P(A) = \frac{\text{Casos Favorables}}{\text{Casos Totales Posibles}}\]
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Ejercicios Resueltos de Probabilidad -->
+                    <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-4">
+                        <h3 class="text-xl font-semibold text-indigo-300 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-base font-bold">3</span>
+                            Ejercicios Resueltos Visuales y Explicativos
+                        </h3>
+                        <p class="text-base text-slate-300">Explora el desglose analítico de estos escenarios clásicos de probabilidad:</p>
+                        
+                        <div class="flex flex-col gap-4">
+                            <!-- Card 1: Dado -->
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-800/80 border border-slate-700 rounded-xl p-5 flex flex-col justify-between shadow-lg hover:border-indigo-500/50 transition">
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-semibold bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full">Caso A</span>
+                                        <span class="text-2xl">🎲</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-white">Lanzamiento de Dado (6 caras)</h4>
+                                    <p class="text-base text-slate-300"><strong>Pregunta:</strong> ¿Probabilidad de obtener un número par?</p>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-700/80 text-base space-y-1">
+                                    <div class="text-slate-300">• Favorables: \(\{2, 4, 6\}\) (3 casos)</div>
+                                    <div class="text-slate-300">• Totales: \(\{1, 2, 3, 4, 5, 6\}\) (6 casos)</div>
+                                    <div class="text-emerald-400 font-bold mt-1 text-lg">Resultado: \(\frac{3}{6} = \frac{1}{2}\) (50%)</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Cartas -->
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-800/80 border border-slate-700 rounded-xl p-5 flex flex-col justify-between shadow-lg hover:border-indigo-500/50 transition">
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-semibold bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full">Caso B</span>
+                                        <span class="text-2xl">🃏</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-white">Baraja Inglesa (52 cartas)</h4>
+                                    <p class="text-base text-slate-300"><strong>Pregunta:</strong> ¿Probabilidad de extraer un As?</p>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-700/80 text-base space-y-1">
+                                    <div class="text-slate-300">• Favorables: 4 Ases (uno por pinta)</div>
+                                    <div class="text-slate-300">• Totales: 52 cartas estándar</div>
+                                    <div class="text-emerald-400 font-bold mt-1 text-lg">Resultado: \(\frac{4}{52} = \frac{1}{13}\)</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: Dominó -->
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-800/80 border border-slate-700 rounded-xl p-5 flex flex-col justify-between shadow-lg hover:border-indigo-500/50 transition">
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-semibold bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full">Caso C</span>
+                                        <span class="text-2xl">🀄</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-white">Juego de Dominó (28 fichas)</h4>
+                                    <p class="text-base text-slate-300"><strong>Pregunta:</strong> ¿Probabilidad de sacar doble 6?</p>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-700/80 text-base space-y-1">
+                                    <div class="text-slate-300">• Favorables: 1 sola ficha (6-6)</div>
+                                    <div class="text-slate-300">• Totales: 28 fichas del set</div>
+                                    <div class="text-emerald-400 font-bold mt-1 text-lg">Resultado: \(\frac{1}{28}\)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Desafío Previo -->
+                    <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-5">
+                        <h3 class="text-xl font-semibold text-indigo-300 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-base font-bold">4</span>
+                            Desafío Previo: Casos Interactivos con Validación
+                        </h3>
+                        <p class="text-lg text-slate-300 leading-relaxed">
+                            Pon a prueba tu intuición resolviendo estos retos interactivos. Selecciona una opción para evaluar tu respuesta al instante:
+                        </p>
+                        
+                        <div class="flex flex-col gap-5">
+                            <!-- Reto 1: Urnas -->
+                            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 space-y-3 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-amber-500/20 text-amber-300 text-sm font-semibold px-2.5 py-0.5 rounded">Reto 1 · Urnas</span>
+                                        <span class="text-sm text-slate-300">3 Rojas, 2 Verdes, 5 Azules</span>
+                                    </div>
+                                    <p class="text-base font-medium text-slate-200">Si extraes una bola al azar de la urna de 10 bolas, ¿cuál es la probabilidad de que sea <strong>verde</strong>?</p>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                                    <button onclick="evaluarReto(1, 'A')" id="btn-r1-a" class="bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition">A) \(\frac{3}{10}\)</button>
+                                    <button onclick="evaluarReto(1, 'B')" id="btn-r1-b" class="bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition">B) \(\frac{2}{10} = \frac{1}{5}\)</button>
+                                    <button onclick="evaluarReto(1, 'C')" id="btn-r1-c" class="bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition">C) \(\frac{5}{10} = \frac{1}{2}\)</button>
+                                    <button onclick="evaluarReto(1, 'D')" id="btn-r1-d" class="bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition">D) \(\frac{2}{5}\)</button>
+                                </div>
+                                <div id="feedback-reto-1" class="hidden text-base p-3 rounded-lg"></div>
+                            </div>
+
+                            <!-- Reto 2: Dados -->
+                            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 space-y-3 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-emerald-500/20 text-emerald-300 text-sm font-semibold px-2.5 py-0.5 rounded">Reto 2 · Dados</span>
+                                        <span class="text-sm text-slate-300">Dado común de 6 caras</span>
+                                    </div>
+                                    <p class="text-base font-medium text-slate-200">Al lanzar un dado de 6 caras, ¿cuál es la probabilidad de obtener un número <strong>primo</strong>?</p>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                                    <button onclick="evaluarReto(2, 'A')" id="btn-r2-a" class="bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition">A) \(\frac{1}{2}\) (\(2,3,5\))</button>
+                                    <button onclick="evaluarReto(2, 'B')" id="btn-r2-b" class="bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition">B) \(\frac{1}{3}\) (\(2,5\))</button>
+                                    <button onclick="evaluarReto(2, 'C')" id="btn-r2-c" class="bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition">C) \(\frac{2}{3}\) (\(1,2,3,5\))</button>
+                                    <button onclick="evaluarReto(2, 'D')" id="btn-r2-d" class="bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition">D) \(\frac{1}{6}\)</button>
+                                </div>
+                                <div id="feedback-reto-2" class="hidden text-base p-3 rounded-lg"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Ley de los Grandes Números -->
+                    <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-5 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl">💡</span>
+                            <div>
+                                <h3 class="text-xl font-semibold text-indigo-200">Ley de los Grandes Números: Teoría vs. Empírico</h3>
+                                <p class="text-sm text-indigo-300">El puente fundamental entre la probabilidad matemática y la experimentación real.</p>
+                            </div>
+                        </div>
+                        <p class="text-base text-slate-300 leading-relaxed">
+                            Cuando realizamos un experimento pocas veces (ej. lanzar una moneda 5 veces), la frecuencia obtenida puede alejarse mucho de la teoría (ej. salir 80% caras). Sin embargo, <strong>al repetir el experimento miles de veces</strong>, la frecuencia empírica converge de manera estable hacia la probabilidad teórica.
+                        </p>
+                        
+                        <!-- Apoyo Gráfico Conceptual -->
+                        <div class="bg-slate-900/80 border border-slate-700 p-4 rounded-xl space-y-3">
+                            <div class="text-sm font-semibold text-slate-300 uppercase tracking-wider text-center">Esquema de Convergencia Estocástica</div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+                                <div class="bg-slate-800 p-3 rounded-lg border border-slate-700/80">
+                                    <div class="text-indigo-400 font-bold text-base">Pocos Ensayos</div>
+                                    <div class="text-sm text-slate-300 mt-1">Alta fluctuación y error aleatorio visible.</div>
+                                </div>
+                                <div class="bg-slate-800 p-3 rounded-lg border border-slate-700/80">
+                                    <div class="text-amber-400 font-bold text-base">Ensayos Moderados</div>
+                                    <div class="text-sm text-slate-300 mt-1">Las oscilaciones comienzan a reducirse progresivamente.</div>
+                                </div>
+                                <div class="bg-slate-800 p-3 rounded-lg border border-slate-700/80">
+                                    <div class="text-emerald-400 font-bold text-base">Grandes Ensayos (N > 1000)</div>
+                                    <div class="text-sm text-slate-300 mt-1">Estabilización exacta en el valor teórico esperado.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 flex justify-end">
+                            <button id="btn-siguiente-intro" onclick="switchTab('experimentos')" disabled class="bg-slate-700 text-slate-400 font-medium px-6 py-3 rounded-xl text-lg transition shadow-lg cursor-not-allowed">
+                                Siguiente ➔ (Esperando 80% del tiempo)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL: EXPERIMENTOS (CON SUBPESTAÑAS) -->
+            <div id="tab-experimentos" class="tab-content hidden space-y-6">
+                <!-- Subpestañas Bar -->
+                <div class="flex bg-slate-800 p-1.5 rounded-xl border border-slate-700 gap-2">
+                    <button onclick="switchSubExperimento('monedas')" id="subbtn-monedas" class="flex-1 py-2 text-base font-semibold rounded-lg bg-indigo-600 text-white transition">Monedas</button>
+                    <button onclick="switchSubExperimento('dados')" id="subbtn-dados" class="flex-1 py-2 text-base font-semibold rounded-lg text-slate-400 hover:text-white transition">Dados</button>
+                    <button onclick="switchSubExperimento('urnas')" id="subbtn-urnas" class="flex-1 py-2 text-base font-semibold rounded-lg text-slate-400 hover:text-white transition">Urnas</button>
+                </div>
+
+                <!-- SUBPANEL 1: MONEDAS -->
+                <div id="subtab-monedas" class="subexp-content space-y-6">
+                    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+                        <h2 class="text-2xl font-semibold text-indigo-400 mb-2">Simulador: Número de Caras en Monedas</h2>
+                        <p class="text-lg text-slate-300 mb-4">
+                            Sea \(X\) la variable aleatoria que representa el número de caras obtenidas al lanzar \(n\) monedas honestas.
+                        </p>
+
+                        <div class="flex flex-wrap items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700 mb-6">
+                            <div>
+                                <label class="block text-base font-medium text-slate-300 mb-1">Monedas (\(n\)):</label>
+                                <select id="num-monedas" class="bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-lg">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3" selected>3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <div class="flex-1 min-w-[200px]">
+                                <label class="block text-base font-medium text-slate-300 mb-1">Lanzamientos:</label>
+                                <div class="flex gap-2">
+                                    <button onclick="simularMonedas(1)" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-3 rounded-lg text-lg">1</button>
+                                    <button onclick="simularMonedas(10)" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-3 rounded-lg text-lg">10</button>
+                                    <button onclick="simularMonedas(100)" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-3 rounded-lg text-lg">100</button>
+                                    <button onclick="simularMonedas(1000)" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-3 rounded-lg text-lg">1000</button>
+                                </div>
+                            </div>
+                            <button onclick="resetSimulacion()" class="bg-rose-600/20 text-rose-300 border border-rose-500/30 px-4 py-2 rounded-lg text-lg self-end">Reiniciar</button>
+                        </div>
+
+                        <div id="visualizador-monedas" class="flex flex-wrap justify-center items-center gap-4 min-h-[100px] bg-slate-900/50 rounded-xl p-4 border border-slate-700/50 mb-6">
+                            <span class="text-slate-400 text-lg">Presiona un botón de lanzamiento</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-lg">
+                                <thead>
+                                    <tr class="bg-slate-900 text-slate-300 border-b border-slate-700">
+                                        <th class="p-3">Valor \(x\)</th>
+                                        <th class="p-3">Absoluta</th>
+                                        <th class="p-3">Relativa (\(h_x\))</th>
+                                        <th class="p-3">Teórica \(P(X=x)\)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-monedas-body" class="divide-y divide-slate-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBPANEL 2: DADOS -->
+                <div id="subtab-dados" class="subexp-content hidden space-y-6">
+                    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+                        <h2 class="text-2xl font-semibold text-emerald-400 mb-2">Simulador: Suma de Dados</h2>
+                        <p class="text-lg text-slate-300 mb-4">
+                            Sea \(X\) la suma de los puntos obtenidos al lanzar \(n\) dados honestos.
+                        </p>
+
+                        <div class="flex flex-wrap items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700 mb-6">
+                            <div>
+                                <label class="block text-base font-medium text-slate-300 mb-1">Dados:</label>
+                                <select id="num-dados" class="bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-lg">
+                                    <option value="2" selected>2 Dados</option>
+                                    <option value="3">3 Dados</option>
+                                    <option value="4">4 Dados</option>
+                                </select>
+                            </div>
+                            <div class="flex-1 min-w-[200px]">
+                                <label class="block text-base font-medium text-slate-300 mb-1">Lanzamientos:</label>
+                                <div class="flex gap-2">
+                                    <button onclick="simularDados(1)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-3 rounded-lg text-lg">1</button>
+                                    <button onclick="simularDados(10)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-3 rounded-lg text-lg">10</button>
+                                    <button onclick="simularDados(100)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-3 rounded-lg text-lg">100</button>
+                                    <button onclick="simularDados(1000)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-3 rounded-lg text-lg">1000</button>
+                                </div>
+                            </div>
+                            <button onclick="resetSimulacionDados()" class="bg-rose-600/20 text-rose-300 border border-rose-500/30 px-4 py-2 rounded-lg text-lg self-end">Reiniciar</button>
+                        </div>
+
+                        <div id="visualizador-dados" class="flex justify-center items-center gap-4 min-h-[100px] bg-slate-900/50 rounded-xl p-4 border border-slate-700/50 mb-6 flex-wrap">
+                            <span class="text-slate-400 text-lg">Lanza los dados</span>
+                        </div>
+
+                        <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                            <table class="w-full text-left border-collapse text-lg">
+                                <thead>
+                                    <tr class="bg-slate-900 text-slate-300 border-b border-slate-700 sticky top-0">
+                                        <th class="p-3">Suma \(x\)</th>
+                                        <th class="p-3">Absoluta</th>
+                                        <th class="p-3">Relativa (\(h_x\))</th>
+                                        <th class="p-3">Teórica \(P(X=x)\)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-dados-body" class="divide-y divide-slate-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBPANEL 3: URNAS -->
+                <div id="subtab-urnas" class="subexp-content hidden space-y-6">
+                    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+                        <h2 class="text-2xl font-semibold text-amber-400 mb-2">Simulador: Extracción de Bolas en Urna</h2>
+                        <p class="text-lg text-slate-300 mb-4">
+                            Extrae 2 bolas con restitución. Sea \(X\) el número de aciertos del color objetivo. La tabla y el modelo se ajustan dinámicamente al incorporar más colores en la urna.
+                        </p>
+
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 mb-6 space-y-4">
+                            <div class="flex flex-wrap items-center gap-4">
+                                <div>
+                                    <label class="block text-base font-medium text-slate-300 mb-1">Colores (2-5):</label>
+                                    <select id="num-colores" class="bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-lg">
+                                        <option value="2" selected>2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-base font-medium text-slate-300 mb-1">Color Objetivo (\(X\)):</label>
+                                    <select id="color-objetivo" class="bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-lg">
+                                        <option value="0">Color 1 (Rojo)</option>
+                                        <option value="1">Color 2 (Azul)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-base font-medium text-slate-300 mb-2">Bolas por color:</label>
+                                <div id="config-colores-container" class="grid grid-cols-2 sm:grid-cols-5 gap-3"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700 mb-6">
+                            <div class="flex gap-2 flex-1">
+                                <button onclick="simularUrnas(1)" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white py-2 px-3 rounded-lg text-lg">1</button>
+                                <button onclick="simularUrnas(10)" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white py-2 px-3 rounded-lg text-lg">10</button>
+                                <button onclick="simularUrnas(100)" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white py-2 px-3 rounded-lg text-lg">100</button>
+                                <button onclick="simularUrnas(1000)" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white py-2 px-3 rounded-lg text-lg">1000</button>
+                            </div>
+                            <button onclick="resetSimulacionUrnas()" class="bg-rose-600/20 text-rose-300 border border-rose-500/30 px-4 py-2 rounded-lg text-lg">Reiniciar</button>
+                        </div>
+
+                        <div id="visualizador-urnas" class="flex justify-center items-center gap-4 min-h-[100px] bg-slate-900/50 rounded-xl p-4 border border-slate-700/50 mb-6">
+                            <span class="text-slate-400 text-lg">Realiza una extracción</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-lg">
+                                <thead>
+                                    <tr class="bg-slate-900 text-slate-300 border-b border-slate-700">
+                                        <th class="p-3">Objetivas \(x\)</th>
+                                        <th class="p-3">Absoluta</th>
+                                        <th class="p-3">Relativa (\(h_x\))</th>
+                                        <th class="p-3">Teórica \(P(X=x)\)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-urnas-body" class="divide-y divide-slate-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de avance para Experimentos -->
+                <div class="flex justify-end pt-2">
+                    <button id="btn-siguiente-experimentos" onclick="switchTab('quiz')" disabled class="bg-slate-700 text-slate-400 font-medium px-6 py-3 rounded-lg text-lg transition shadow-lg cursor-not-allowed">
+                        Siguiente ➔ (Esperando 80% del tiempo)
+                    </button>
+                </div>
+            </div>
+
+            <!-- PANEL 4: QUIZ FINAL -->
+            <div id="tab-quiz" class="tab-content hidden space-y-6">
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                    <div class="border-b border-slate-700 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <span class="text-indigo-400 text-sm font-semibold tracking-wider uppercase">Evaluación Sumativa OA 10</span>
+                            <h2 class="text-3xl font-bold text-white mt-1">Quiz Final del Laboratorio</h2>
+                            <p class="text-lg text-slate-300 mt-1">Responde las 10 preguntas basadas en el trabajo realizado.</p>
+                        </div>
+                    </div>
+
+                    <!-- Input Nombre y Curso Estudiante -->
+                    <div id="seccion-nombre" class="bg-indigo-950/40 border border-indigo-500/30 p-5 rounded-xl flex flex-col sm:flex-row items-center gap-4">
+                        <div class="flex-1 w-full">
+                            <label class="block text-base font-medium text-indigo-200 mb-1">Nombre y Apellido del Estudiante:</label>
+                            <input type="text" id="nombre-estudiante" placeholder="Ej: William López" class="w-full bg-slate-900 text-white border border-indigo-500/40 rounded-lg px-3 py-2.5 text-lg focus:outline-none focus:border-indigo-400 mb-3">
+                            <label class="block text-base font-medium text-indigo-200 mb-1">Curso / Sección:</label>
+                            <select id="curso-estudiante" class="w-full bg-slate-900 text-white border border-indigo-500/40 rounded-lg px-3 py-2.5 text-lg focus:outline-none focus:border-indigo-400">
+                                <option value="2° Medio A">2° Medio A</option>
+                                <option value="2° Medio B">2° Medio B</option>
+                                <option value="2° Medio C">2° Medio C</option>
+                            </select>
+                        </div>
+                        <button onclick="iniciarQuiz()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-3 rounded-lg text-lg transition mt-auto">
+                            Comenzar Quiz ➔
+                        </button>
+                    </div>
+
+                    <!-- Contenedor Preguntas -->
+                    <div id="contenedor-preguntas" class="hidden space-y-6">
+                        <div id="lista-preguntas" class="space-y-6"></div>
+                        <div class="pt-4 border-t border-slate-700 flex justify-end">
+                            <button onclick="enviarQuiz()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-8 py-3.5 rounded-xl text-lg transition shadow-lg">
+                                Enviar Respuestas y Guardar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resultado individual -->
+                    <div id="resultado-quiz" class="hidden bg-emerald-950/40 border border-emerald-500/30 p-6 rounded-xl text-center space-y-3">
+                        <h3 class="text-2xl font-bold text-emerald-300">¡Evaluación Enviada con Éxito!</h3>
+                        <p id="texto-puntaje" class="text-lg text-slate-200"></p>
+                        <button onclick="reiniciarQuiz()" class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2.5 rounded-lg text-base transition">Realizar de Nuevo</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico Comparativo Chart.js -->
+            <div id="contenedor-grafico" class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl hidden">
+                <h3 class="text-xl font-semibold text-white mb-1">Comparación: Frecuencia Relativa vs Probabilidad Teórica</h3>
+                <p class="text-base text-slate-300 mb-4">A mayor número de simulaciones, las frecuencias relativas convergen hacia las probabilidades teóricas.</p>
+                <div class="relative h-64 w-full">
+                    <canvas id="graficoProbabilidad"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Columna Lateral: Chatbox IA y Guía -->
+        <div class="space-y-6 flex flex-col">
+            
+            <!-- CHATBOX IA EXPERTO EN OA 10 Y MATEMÁTICA -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl flex flex-col">
+                <div class="flex items-center gap-2 mb-3 border-b border-slate-700 pb-2">
+                    <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <h2 class="text-lg font-bold text-white uppercase tracking-wider">Tutor IA - OA 10</h2>
+                </div>
+                <p class="text-base text-slate-300 mb-3">Pregúntame sobre números primos, pares, probabilidad, Laplace, monedas, dados, urnas o cualquier concepto matemático.</p>
+                
+                <div id="chat-messages" class="bg-slate-900 rounded-xl p-3 h-60 overflow-y-auto space-y-3 text-base mb-3 border border-slate-700/50">
+                    <div class="bg-indigo-950/60 border border-indigo-500/30 p-3 rounded-lg text-indigo-200">
+                        <strong>Tutor IA:</strong> ¡Hola! Estoy aquí para resolver tus dudas sobre matemáticas, estadística y probabilidad. ¿Qué deseas consultar hoy?
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-auto">
+                    <input type="text" id="chat-input" placeholder="Ej: ¿Qué son los números primos?" class="flex-1 bg-slate-900 text-white border border-slate-700 rounded-lg px-3 py-2.5 text-base focus:outline-none focus:border-indigo-500" onkeypress="if(event.key === 'Enter') enviarMensajeChat()">
+                    <button onclick="enviarMensajeChat()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-lg text-base font-medium transition">Preguntar</button>
+                </div>
+            </div>
+
+            <!-- GUÍA Y ANÁLISIS EXPERIMENTAL -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl flex flex-col space-y-4">
+                <div class="flex items-center gap-2 border-b border-slate-700 pb-3">
+                    <div class="w-3 h-3 bg-indigo-500 rounded-full"></div>
+                    <h2 class="text-lg font-bold text-white uppercase tracking-wider">Guía y Análisis</h2>
+                </div>
+                <div id="guia-contenido" class="space-y-3 text-base text-slate-300 leading-relaxed"></div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal Panel Docente -->
+    <div id="modal-docente" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-4">
+                <div>
+                    <span class="text-indigo-400 text-sm font-semibold uppercase">Gestión Docente</span>
+                    <h3 class="text-2xl font-bold text-white">Panel de Resultados y Control</h3>
+                </div>
+                <button onclick="cerrarModalDocente()" class="text-slate-400 hover:text-white text-2xl font-bold">✕</button>
+            </div>
+
+            <!-- Autenticación Docente -->
+            <div id="auth-docente" class="space-y-4">
+                <p class="text-base text-slate-300">Ingrese la clave de docente:</p>
+                <div class="flex gap-3 max-w-md">
+                    <input type="password" id="input-clave-docente" placeholder="Clave docente" class="flex-1 bg-slate-900 text-white border border-slate-700 rounded-lg px-3 py-2.5 text-lg">
+                    <button onclick="verificarClaveDocente()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg text-lg font-medium">Ingresar</button>
+                </div>
+            </div>
+
+            <!-- Contenido Protegido Docente -->
+            <div id="contenido-docente" class="hidden space-y-6">
+                <div class="bg-indigo-950/50 border border-indigo-500/40 p-4 rounded-xl flex items-center justify-between gap-4">
+                    <div>
+                        <h4 class="text-base font-bold text-indigo-200">✨ Modo Docente Activo</h4>
+                        <p class="text-sm text-slate-300">El control de tiempo estricto ha sido desactivado. Puedes navegar libremente por todas las pestañas de la herramienta.</p>
+                    </div>
+                    <span class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-sm font-semibold">Acceso Libre</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-center">
+                        <span class="text-base text-slate-400">Total Estudiantes Evaluados</span>
+                        <h4 id="stat-total-estudiantes" class="text-4xl font-bold text-indigo-400 mt-1">0</h4>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-center">
+                        <span class="text-base text-slate-400">Promedio General</span>
+                        <h4 id="stat-promedio" class="text-4xl font-bold text-emerald-400 mt-1">0 / 10</h4>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-center flex items-center justify-center">
+                        <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-lg text-base font-medium transition">📥 Exportar Registros CSV</button>
+                    </div>
+                </div>
+
+                <!-- Filtro por curso para reportes -->
+                <div class="flex items-center gap-3 bg-slate-900 p-3 rounded-xl border border-slate-700">
+                    <label class="text-base font-medium text-slate-300">Filtrar reporte por curso:</label>
+                    <select id="filtro-curso-docente" onchange="actualizarPanelDocente()" class="bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-1.5 text-base">
+                        <option value="TODOS">Todos los Cursos</option>
+                        <option value="2° Medio A">2° Medio A</option>
+                        <option value="2° Medio B">2° Medio B</option>
+                        <option value="2° Medio C">2° Medio C</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700">
+                        <h4 class="text-base font-semibold text-slate-300 mb-3">Distribución de Puntajes</h4>
+                        <div class="relative h-48 w-full"><canvas id="graficoDocenteTotales"></canvas></div>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700">
+                        <h4 class="text-base font-semibold text-slate-300 mb-3">% de Aciertos por Pregunta (P1 a P10)</h4>
+                        <div class="relative h-48 w-full"><canvas id="graficoDocentePreguntas"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                    <table class="w-full text-left border-collapse text-base">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-300 border-b border-slate-700 sticky top-0">
+                                <th class="p-3">Estudiante</th>
+                                <th class="p-3">Curso</th>
+                                <th class="p-3">Puntaje</th>
+                                <th class="p-3">Fecha / Hora</th>
+                                <th class="p-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-estudiantes-body" class="divide-y divide-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 border-t border-slate-700 text-center py-4 text-base text-slate-400 mt-auto">
+        Todos los Derechos Reservados. William López González
+    </footer>
+
+    <!-- Lógica de la Aplicación -->
+    <script>
+        let currentTab = 'inicio';
+        let currentSubExp = 'monedas';
+        let totalSimulaciones = 0;
+        let esModoDocente = false;
+
+        const tiemposPestañas = {
+            'inicio': 8 * 60,
+            'introduccion': 10 * 60,
+            'experimentos': 15 * 60,
+            'quiz': 20 * 60
+        };
+        let tiempoRestante = tiemposPestañas['inicio'];
+        let temporizadorInterval = null;
+
+        let nMonedas = 3;
+        let freqMonedas = {};
+
+        let nDados = 2;
+        let freqDados = {};
+        let cacheProbDados = {};
+
+        let nColoresUrna = 2;
+        let configUrnaBolas = [3, 2];
+        let colorObjetivoIdx = 0;
+        let freqUrnas = {0: 0, 1: 0, 2: 0};
+        const nombresColores = ["Rojo", "Azul", "Verde", "Amarillo", "Violeta"];
+        const clasesColoresCSS = ["bg-rose-600", "bg-blue-600", "bg-emerald-600", "bg-amber-500 text-slate-900", "bg-purple-600"];
+
+        const preguntasQuiz = [
+            {
+                pregunta: "1. ¿Qué representa una variable aleatoria finita en el contexto del OA 10?",
+                opciones: [
+                    "Una incógnita algebraica que siempre toma un valor fijo desconocido.",
+                    "Una función que asigna un número real a cada resultado de un experimento aleatorio.",
+                    "La cantidad exacta de veces que se realiza una simulación.",
+                    "El margen de error de un cálculo estadístico."
+                ],
+                correcta: 1
+            },
+            {
+                pregunta: "2. Si lanzamos 3 monedas honestas, ¿cuál es el recorrido o conjunto de valores posibles (\(R_X\)) para el número de caras (\(X\))?",
+                opciones: ["\\{1, 2, 3\\}", "\\{0, 1, 2\\}", "\\{0, 1, 2, 3\\}", "\\{1, 2, 3, 4, 5\\}"],
+                correcta: 2
+            },
+            {
+                pregunta: "3. ¿Cómo se define la probabilidad teórica según la Regla de Laplace para eventos equiprobables?",
+                opciones: [
+                    "Casos Totales divididos por Casos Favorables.",
+                    "Casos Favorables divididos por Casos Totales Posibles.",
+                    "La frecuencia absoluta multiplicada por 100.",
+                    "La diferencia entre los resultados máximos y mínimos."
+                ],
+                correcta: 1
+            },
+            {
+                pregunta: "4. Al lanzar 2 dados honestos, ¿cuál es la suma de los puntos que posee mayor probabilidad teórica?",
+                opciones: ["2 y 12", "6 y 8", "7", "4 y 10"],
+                correcta: 2
+            },
+            {
+                pregunta: "5. ¿Qué establece la Ley de los Grandes Números observada en los simuladores?",
+                opciones: [
+                    "Que con pocos intentos la probabilidad empírica es perfecta.",
+                    "Que al aumentar el número de ensayos, la frecuencia relativa converge hacia la probabilidad teórica.",
+                    "Que los eventos imposibles ocurren si se simulan muchas veces.",
+                    "Que el azar deja de existir al superar los 100 lanzamientos."
+                ],
+                correcta: 1
+            },
+            {
+                pregunta: "6. Si en una urna hay 3 bolas rojas y 2 azules, y extraemos 2 con restitución, ¿cuál es la probabilidad teórica de no obtener ninguna bola roja (\(X=0\))?",
+                opciones: ["\\(\\frac{4}{25}\\)", "\\(\\frac{9}{25}\\)", "\\(\\frac{6}{25}\\)", "\\(\\frac{1}{25}\\)"],
+                correcta: 0
+            },
+            {
+                pregunta: "7. ¿Qué diferencia principal existe entre probabilidad teórica y probabilidad empírica?",
+                opciones: [
+                    "La teórica usa datos experimentales y la empírica usa fórmulas.",
+                    "La teórica se obtiene mediante razonamiento analítico y la empírica ejecutando el experimento.",
+                    "No existe ninguna diferencia matemática.",
+                    "La empírica indicadores solo se puede calcular con monedas."
+                ],
+                correcta: 1
+            },
+            {
+                pregunta: "8. Si la probabilidad de un evento es \(P(A) = 0.5\), ¿cómo se interpreta este valor?",
+                opciones: ["Es un evento imposible.", "Es un evento seguro.", "Representa una situación de completa incertidumbre o 50% de opción.", "Ocurrirá el doble de veces que no ocurra."],
+                correcta: 2
+            },
+            {
+                pregunta: "9. ¿Qué indica una frecuencia relativa cercana a 1 al simular un evento aleatorio?",
+                opciones: ["Que el evento es casi seguro que ocurra en el modelo.", "Que el experimento falló.", "Que el recorrido de la variable es negativo.", "Que se lanzaron pocas monedas."],
+                correcta: 0
+            },
+            {
+                pregunta: "10. ¿Cuál es el propósito principal de modelar variables aleatorias finitas mediante simuladores interactivos?",
+                opciones: [
+                    "Reemplazar por completo el cálculo manual en papel.",
+                    "Visualizar de forma intuitiva la relación entre modelos estocásticos teóricos y resultados reales.",
+                    "Generar números aleatorios para contraseñas de internet.",
+                    "Comprobar que el azar no sigue ninguna regla matemática."
+                ],
+                correcta: 1
+            }
+        ];
+
+        let estudianteActual = "";
+        let cursoActual = "2° Medio A";
+        let resultadosGuardados = JSON.parse(localStorage.getItem('quiz_oa10_resultados') || '[]');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMonedas();
+            initDados();
+            initUrnaConfig();
+            initUrnas();
+            renderQuiz();
+            actualizarGuiaAnalisis();
+            actualizarGrafico();
+            iniciarTemporizador();
+        });
+
+        function iniciarTemporizador() {
+            if (temporizadorInterval) clearInterval(temporizadorInterval);
+            tiempoRestante = tiemposPestañas[currentTab];
+            actualizarDisplayReloj();
+            actualizarBotonSiguiente();
+
+            if (esModoDocente) return;
+
+            temporizadorInterval = setInterval(() => {
+                if (tiempoRestante > 0) {
+                    tiempoRestante--;
+                    actualizarDisplayReloj();
+                    actualizarBotonSiguiente();
+                } else {
+                    clearInterval(temporizadorInterval);
+                    forzarSiguientePestana();
+                }
+            }, 1000);
+        }
+
+        function actualizarDisplayReloj() {
+            if (esModoDocente) {
+                document.getElementById('timer-display').textContent = "MODO DOCENTE";
+                return;
+            }
+            let m = Math.floor(tiempoRestante / 60);
+            let s = tiempoRestante % 60;
+            document.getElementById('timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function actualizarBotonSiguiente() {
+            let btnId = '';
+            if (currentTab === 'inicio') btnId = 'btn-siguiente-inicio';
+            if (currentTab === 'introduccion') btnId = 'btn-siguiente-intro';
+            if (currentTab === 'experimentos') btnId = 'btn-siguiente-experimentos';
+
+            let btn = document.getElementById(btnId);
+            if (!btn) return;
+
+            if (esModoDocente) {
+                btn.disabled = false;
+                btn.classList.remove('bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
+                btn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'shadow-lg');
+                btn.textContent = 'Siguiente ➔ (Libre - Docente)';
+                return;
+            }
+
+            let tiempoTotal = tiemposPestañas[currentTab];
+            let tiempoTranscurrido = tiempoTotal - tiempoRestante;
+            let habilitado = tiempoTranscurrido >= (tiempoTotal * 0.80);
+
+            if (habilitado) {
+                btn.disabled = false;
+                btn.classList.remove('bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
+                btn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'shadow-lg');
+                btn.textContent = 'Siguiente ➔';
+            } else {
+                btn.disabled = true;
+                let segundosFaltantes = Math.ceil((tiempoTotal * 0.80) - tiempoTranscurrido);
+                let minF = Math.floor(segundosFaltantes / 60);
+                let secF = segundosFaltantes % 60;
+                btn.textContent = `Siguiente ➔ (Disponible en ${minF}:${secF.toString().padStart(2,'0')})`;
+            }
+        }
+
+        function forzarSiguientePestana() {
+            if (esModoDocente) return;
+            const orden = ['inicio', 'introduccion', 'experimentos', 'quiz'];
+            let idx = orden.indexOf(currentTab);
+            if (idx < orden.length - 1) {
+                alert("¡El tiempo reglamentado de esta sección ha concluido. Avanzando automáticamente!");
+                switchTab(orden[idx + 1], true);
+            }
+        }
+
+        function switchTab(tab, forzado = false) {
+            if (!esModoDocente && !forzado) {
+                let tiempoTotal = tiemposPestañas[currentTab];
+                let tiempoTranscurrido = tiempoTotal - tiempoRestante;
+                let cumplido80 = tiempoTranscurrido >= (tiempoTotal * 0.80);
+
+                if (!cumplido80) {
+                    alert("Aún no se cumple el 80% del tiempo reglamentado en esta etapa. No puedes avanzar todavía.");
+                    return;
+                }
+            }
+
+            currentTab = tab;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+
+            const contenedorGrafico = document.getElementById('contenedor-grafico');
+            if (tab === 'inicio' || tab === 'introduccion' || tab === 'quiz') {
+                contenedorGrafico.classList.add('hidden');
+            } else {
+                contenedorGrafico.classList.remove('hidden');
+            }
+
+            ['inicio', 'introduccion', 'experimentos', 'quiz'].forEach(t => {
+                const btn = document.getElementById(`btn-${t}`);
+                if (btn) {
+                    if (t === tab) {
+                        btn.className = "px-4 py-2 text-lg font-medium rounded-lg bg-indigo-600 text-white transition";
+                    } else {
+                        btn.className = "px-4 py-2 text-lg font-medium rounded-lg text-slate-400 hover:text-white transition";
+                    }
+                }
+            });
+
+            actualizarGuiaAnalisis();
+            if (tab === 'experimentos') actualizarGrafico();
+            iniciarTemporizador();
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function switchSubExperimento(sub) {
+            currentSubExp = sub;
+            document.querySelectorAll('.subexp-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`subtab-${sub}`).classList.remove('hidden');
+
+            ['monedas', 'dados', 'urnas'].forEach(s => {
+                const btn = document.getElementById(`subbtn-${s}`);
+                if (s === sub) {
+                    btn.className = "flex-1 py-2 text-base font-semibold rounded-lg bg-indigo-600 text-white transition";
+                } else {
+                    btn.className = "flex-1 py-2 text-base font-semibold rounded-lg text-slate-400 hover:text-white transition";
+                }
+            });
+            actualizarGrafico();
+        }
+
+        function evaluarReto(retoNum, opcion) {
+            if (retoNum === 1) {
+                let feedback = document.getElementById('feedback-reto-1');
+                feedback.classList.remove('hidden');
+                ['A', 'B', 'C', 'D'].forEach(op => {
+                    let b = document.getElementById(`btn-r1-${op.toLowerCase()}`);
+                    b.className = "bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition";
+                });
+                let btnSel = document.getElementById(`btn-r1-${opcion.toLowerCase()}`);
+
+                if (opcion === 'B') {
+                    btnSel.className = "bg-emerald-600 text-white text-base py-3 px-4 rounded-lg border border-emerald-500 font-bold";
+                    feedback.className = "text-base p-3 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-200";
+                    feedback.innerHTML = "✅ <strong>¡Correcto!</strong> Hay 2 bolas verdes de un total de 10. Por tanto, \\(\\frac{2}{10} = \\frac{1}{5}\\).";
+                } else {
+                    btnSel.className = "bg-rose-600/70 text-white text-base py-3 px-4 rounded-lg border border-rose-500 font-bold";
+                    feedback.className = "text-base p-3 rounded-lg bg-rose-950/60 border border-rose-500/40 text-rose-200";
+                    feedback.innerHTML = "❌ <strong>Incorrecto.</strong> Recuerda que el total de casos es 10 y los favorables de color verde son 2. <br><em>💡 Escribe en el Chat IA de la derecha si tienes dudas sobre esta fracción.</em>";
+                }
+            } else if (retoNum === 2) {
+                let feedback = document.getElementById('feedback-reto-2');
+                feedback.classList.remove('hidden');
+                ['A', 'B', 'C', 'D'].forEach(op => {
+                    let b = document.getElementById(`btn-r2-${op.toLowerCase()}`);
+                    b.className = "bg-slate-900 hover:bg-slate-700 text-slate-200 text-base py-3 px-4 rounded-lg border border-slate-700 transition";
+                });
+                let btnSel = document.getElementById(`btn-r2-${opcion.toLowerCase()}`);
+
+                if (opcion === 'A') {
+                    btnSel.className = "bg-emerald-600 text-white text-base py-3 px-4 rounded-lg border border-emerald-500 font-bold";
+                    feedback.className = "text-base p-3 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-200";
+                    feedback.innerHTML = "✅ <strong>¡Correcto!</strong> Los números primos en un dado de 6 caras son \\(2, 3\\) y \\(5\\) (3 casos de 6). \\(\\frac{3}{6} = \\frac{1}{2}\\).";
+                } else {
+                    btnSel.className = "bg-rose-600/70 text-white text-base py-3 px-4 rounded-lg border border-rose-500 font-bold";
+                    feedback.className = "text-base p-3 rounded-lg bg-rose-950/60 border border-rose-500/40 text-rose-200";
+                    feedback.innerHTML = "❌ <strong>Incorrecto.</strong> Ten en cuenta que el 1 no es primo y el 4 es compuesto. Los primos son 3 en total. <br><em>💡 Consulta con el Tutor IA de la derecha para repasar números primos.</em>";
+                }
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function mcd(a, b) { return b === 0 ? a : mcd(b, a % b); }
+        function fraccionIrreducible(num, den) {
+            if (num === 0) return "0";
+            if (num === den) return "1";
+            let divisor = mcd(Math.abs(num), Math.abs(den));
+            let n = num / divisor;
+            let d = den / divisor;
+            if (d === 1) return `${n}`;
+            return `\\frac{${n}}{${d}}`;
+        }
+        function coeficienteBinomial(n, k) {
+            if (k < 0 || k > n) return 0;
+            if (k === 0 || k === n) return 1;
+            let c = 1;
+            for (let i = 1; i <= k; i++) c = c * (n - (k - i)) / i;
+            return c;
+        }
+
+        document.addEventListener('change', (e) => {
+            if (e.target && e.target.id === 'num-monedas') {
+                nMonedas = parseInt(e.target.value);
+                resetSimulacion();
+            }
+        });
+        function initMonedas() {
+            freqMonedas = {};
+            for (let i = 0; i <= nMonedas; i++) freqMonedas[i] = 0;
+            totalSimulaciones = 0;
+            renderTablaMonedas();
+        }
+        function resetSimulacion() {
+            initMonedas();
+            const vis = document.getElementById('visualizador-monedas');
+            if(vis) vis.innerHTML = '<span class="text-slate-400 text-lg">Simulación reiniciada.</span>';
+            actualizarGrafico();
+        }
+        function probabilidadTeoricaMonedas(k, n) { return coeficienteBinomial(n, k) / Math.pow(2, n); }
+        function simularMonedas(cantidad) {
+            let htmlCoins = '';
+            for (let s = 0; s < cantidad; s++) {
+                let caras = 0;
+                let resLanz = [];
+                for (let i = 0; i < nMonedas; i++) {
+                    let esCara = Math.random() < 0.5;
+                    if (esCara) caras++;
+                    resLanz.push(esCara);
+                }
+                freqMonedas[caras]++;
+                totalSimulaciones++;
+                if (cantidad === 1) {
+                    htmlCoins = resLanz.map(c => `
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg shadow-lg coin flip ${c ? 'bg-amber-500 text-slate-900 border-2 border-amber-300' : 'bg-slate-700 text-slate-200 border-2 border-slate-500'}">
+                            ${c ? 'C' : 'S'}
+                        </div>
+                    `).join('');
+                }
+            }
+            if (cantidad > 1) htmlCoins = `<span class="text-indigo-400 font-medium text-lg">¡Simulados ${cantidad} lanzamientos! Acumulado: ${totalSimulaciones}</span>`;
+            document.getElementById('visualizador-monedas').innerHTML = htmlCoins;
+            renderTablaMonedas();
+            actualizarGrafico();
+        }
+        function renderTablaMonedas() {
+            const tbody = document.getElementById('tabla-monedas-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            let total = Object.values(freqMonedas).reduce((a, b) => a + b, 0);
+            for (let i = 0; i <= nMonedas; i++) {
+                let abs = freqMonedas[i];
+                let rel = total > 0 ? (abs / total).toFixed(4) : '0.0000';
+                let comb = coeficienteBinomial(nMonedas, i);
+                let den = Math.pow(2, nMonedas);
+                let teoricaVal = probabilidadTeoricaMonedas(i, nMonedas);
+                let fracStr = fraccionIrreducible(comb, den);
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-indigo-300">\\(X = ${i}\\)</td>
+                    <td class="p-3">${abs}</td>
+                    <td class="p-3">${rel}</td>
+                    <td class="p-3 text-emerald-400">${teoricaVal.toFixed(4)} \\(\\left(${fracStr}\\right)\\)</td>
+                `;
+                tbody.appendChild(tr);
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        document.addEventListener('change', (e) => {
+            if (e.target && e.target.id === 'num-dados') {
+                nDados = parseInt(e.target.value);
+                resetSimulacionDados();
+            }
+        });
+        function initDados() {
+            freqDados = {};
+            for (let i = nDados; i <= nDados * 6; i++) freqDados[i] = 0;
+            calcularDistribucionDados();
+            renderTablaDados();
+        }
+        function resetSimulacionDados() {
+            initDados();
+            const vis = document.getElementById('visualizador-dados');
+            if(vis) vis.innerHTML = '<span class="text-slate-400 text-lg">Simulación reiniciada.</span>';
+            actualizarGrafico();
+        }
+        function calcularDistribucionDados() {
+            cacheProbDados = {};
+            let totalCasos = Math.pow(6, nDados);
+            let conteos = {};
+            for (let i = nDados; i <= nDados * 6; i++) conteos[i] = 0;
+            function generar(dadoActual, sumaActual) {
+                if (dadoActual === nDados) {
+                    for (let c = 1; c <= 6; c++) conteos[sumaActual + c]++;
+                    return;
+                }
+                for (let c = 1; c <= 6; c++) generar(dadoActual + 1, sumaActual + c);
+            }
+            generar(1, 0);
+            for (let i = nDados; i <= nDados * 6; i++) {
+                cacheProbDados[i] = { favorables: conteos[i], totales: totalCasos, prob: conteos[i] / totalCasos };
+            }
+        }
+        function simularDados(cantidad) {
+            let ultimosDados = [];
+            for (let s = 0; s < cantidad; s++) {
+                let suma = 0;
+                ultimosDados = [];
+                for (let i = 0; i < nDados; i++) {
+                    let d = Math.floor(Math.random() * 6) + 1;
+                    suma += d;
+                    ultimosDados.push(d);
+                }
+                freqDados[suma]++;
+            }
+            if (cantidad === 1) {
+                document.getElementById('visualizador-dados').innerHTML = `
+                    <div class="flex items-center gap-2 flex-wrap">
+                        ${ultimosDados.map((d, idx) => `
+                            <div class="w-14 h-14 bg-emerald-700 text-white rounded-xl flex items-center justify-center text-2xl font-bold shadow">${d}</div>${idx < ultimosDados.length - 1 ? '<span class="text-2xl font-bold">+</span>' : ''}
+                        `).join('')}
+                        <span class="text-2xl font-bold">=</span>
+                        <div class="w-14 h-14 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-2xl font-bold shadow">${ultimosDados.reduce((a,b)=>a+b, 0)}</div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('visualizador-dados').innerHTML = `<span class="text-emerald-400 font-medium text-lg">¡Simulados ${cantidad} lanzamientos!</span>`;
+            }
+            renderTablaDados();
+            actualizarGrafico();
+        }
+        function renderTablaDados() {
+            const tbody = document.getElementById('tabla-dados-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            for (let i = nDados; i <= nDados * 6; i++) {
+                let abs = freqDados[i] || 0;
+                let total = Object.values(freqDados).reduce((a, b) => a + b, 0);
+                let rel = total > 0 ? (abs / total).toFixed(4) : '0.0000';
+                let info = cacheProbDados[i] || { prob: 0, favorables: 0, totales: Math.pow(6, nDados) };
+                let fracStr = fraccionIrreducible(info.favorables, info.totales);
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-emerald-300">\\(X = ${i}\\)</td>
+                    <td class="p-3">${abs}</td>
+                    <td class="p-3">${rel}</td>
+                    <td class="p-3 text-emerald-400">${info.prob.toFixed(4)} \\(\\left(${fracStr}\\right)\\)</td>
+                `;
+                tbody.appendChild(tr);
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        document.addEventListener('change', (e) => {
+            if (e.target && e.target.id === 'num-colores') {
+                nColoresUrna = parseInt(e.target.value);
+                if (configUrnaBolas.length < nColoresUrna) {
+                    while (configUrnaBolas.length < nColoresUrna) configUrnaBolas.push(2);
+                } else {
+                    configUrnaBolas = configUrnaBolas.slice(0, nColoresUrna);
+                }
+                if (colorObjetivoIdx >= nColoresUrna) {
+                    colorObjetivoIdx = 0;
+                }
+                actualizarSelectColorObjetivo();
+                initUrnaConfig();
+                resetSimulacionUrnas();
+            } else if (e.target && e.target.id === 'color-objetivo') {
+                colorObjetivoIdx = parseInt(e.target.value);
+                resetSimulacionUrnas();
+            }
+        });
+
+        function actualizarSelectColorObjetivo() {
+            const selectObj = document.getElementById('color-objetivo');
+            if(!selectObj) return;
+            selectObj.innerHTML = '';
+            for (let i = 0; i < nColoresUrna; i++) {
+                let opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = `${nombresColores[i]} (Color ${i+1})`;
+                if (i === colorObjetivoIdx) opt.selected = true;
+                selectObj.appendChild(opt);
+            }
+        }
+
+        function initUrnaConfig() {
+            const container = document.getElementById('config-colores-container');
+            if(!container) return;
+            container.innerHTML = '';
+            for (let i = 0; i < nColoresUrna; i++) {
+                let div = document.createElement('div');
+                div.className = "flex flex-col gap-1";
+                div.innerHTML = `
+                    <label class="text-base font-medium text-slate-300">${nombresColores[i]}:</label>
+                    <input type="number" min="1" max="50" value="${configUrnaBolas[i]}" data-color-idx="${i}" class="input-cantidad-bola bg-slate-800 text-white border border-slate-600 rounded-lg px-2.5 py-1.5 text-lg">
+                `;
+                container.appendChild(div);
+            }
+            document.querySelectorAll('.input-cantidad-bola').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    let idx = parseInt(e.target.getAttribute('data-color-idx'));
+                    let val = parseInt(e.target.value) || 1;
+                    configUrnaBolas[idx] = val;
+                    resetSimulacionUrnas();
+                });
+            });
+            actualizarSelectColorObjetivo();
+        }
+
+        function initUrnas() {
+            freqUrnas = {0: 0, 1: 0, 2: 0};
+            renderTablaUrnas();
+        }
+
+        function resetSimulacionUrnas() {
+            initUrnas();
+            const vis = document.getElementById('visualizador-urnas');
+            if(vis) vis.innerHTML = '<span class="text-slate-400 text-lg">Simulación reiniciada.</span>';
+            actualizarGrafico();
+        }
+
+        function probabilidadTeoricaUrnas(k) {
+            let totalBolas = configUrnaBolas.reduce((a, b) => a + b, 0);
+            let pObj = configUrnaBolas[colorObjetivoIdx] / totalBolas;
+            if (k === 0) return Math.pow(1 - pObj, 2);
+            if (k === 1) return 2 * pObj * (1 - pObj);
+            if (k === 2) return Math.pow(pObj, 2);
+            return 0;
+        }
+
+        function fraccionUrnasStr(k) {
+            let totalBolas = configUrnaBolas.reduce((a, b) => a + b, 0);
+            let bObj = configUrnaBolas[colorObjetivoIdx];
+            let bResto = totalBolas - bObj;
+            let den = Math.pow(totalBolas, 2);
+            let num = (k === 0) ? Math.pow(bResto, 2) : (k === 1 ? 2 * bObj * bResto : Math.pow(bObj, 2));
+            return fraccionIrreducible(num, den);
+        }
+
+        function simularUrnas(cantidad) {
+            let totalBolas = configUrnaBolas.reduce((a, b) => a + b, 0);
+            let ultimoResultado = [];
+            for (let s = 0; s < cantidad; s++) {
+                let aciertos = 0;
+                ultimoResultado = [];
+                for (let i = 0; i < 2; i++) {
+                    let rand = Math.floor(Math.random() * totalBolas);
+                    let acumulado = 0;
+                    let colorSeleccionado = 0;
+                    for (let c = 0; c < configUrnaBolas.length; c++) {
+                        acumulado += configUrnaBolas[c];
+                        if (rand < acumulado) { colorSeleccionado = c; break; }
+                    }
+                    if (colorSeleccionado === colorObjetivoIdx) aciertos++;
+                    ultimoResultado.push(colorSeleccionado);
+                }
+                freqUrnas[aciertos]++;
+            }
+            if (cantidad === 1) {
+                document.getElementById('visualizador-urnas').innerHTML = `
+                    <div class="flex items-center gap-3">
+                        ${ultimoResultado.map(cIdx => `
+                            <div class="w-14 h-14 rounded-full flex items-center justify-center font-bold text-white shadow text-xl ${clasesColoresCSS[cIdx]}">${nombresColores[cIdx][0]}</div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                document.getElementById('visualizador-urnas').innerHTML = `<span class="text-amber-400 font-medium text-lg">¡Realizadas ${cantidad} extracciones!</span>`;
+            }
+            renderTablaUrnas();
+            actualizarGrafico();
+        }
+
+        function renderTablaUrnas() {
+            const tbody = document.getElementById('tabla-urnas-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            let total = Object.values(freqUrnas).reduce((a, b) => a + b, 0);
+            for (let i = 0; i <= 2; i++) {
+                let abs = freqUrnas[i] || 0;
+                let rel = total > 0 ? (abs / total).toFixed(4) : '0.0000';
+                let teoricaVal = probabilidadTeoricaUrnas(i);
+                let fracStr = fraccionUrnasStr(i);
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-amber-300">\\(X = ${i}\\)</td>
+                    <td class="p-3">${abs}</td>
+                    <td class="p-3">${rel}</td>
+                    <td class="p-3 text-emerald-400">${teoricaVal.toFixed(4)} \\(\\left(${fracStr}\\right)\\)</td>
+                `;
+                tbody.appendChild(tr);
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('lista-preguntas');
+            if(!container) return;
+            container.innerHTML = '';
+            preguntasQuiz.forEach((q, idx) => {
+                let div = document.createElement('div');
+                div.className = "bg-slate-900/70 border border-slate-700/70 p-5 rounded-xl space-y-3";
+                div.innerHTML = `
+                    <h4 class="text-lg font-semibold text-white">${q.pregunta}</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        ${q.opciones.map((opt, oIdx) => `
+                            <label class="flex items-center gap-3 bg-slate-800 hover:bg-slate-700/80 p-3.5 rounded-lg border border-slate-700 cursor-pointer text-base transition">
+                                <input type="radio" name="p_${idx}" value="${oIdx}" class="text-indigo-600 focus:ring-indigo-500 w-5 h-5">
+                                <span class="text-slate-200">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function iniciarQuiz() {
+            const input = document.getElementById('nombre-estudiante');
+            const nombre = input.value.trim();
+            const cursoSelect = document.getElementById('curso-estudiante');
+            if (!nombre) {
+                alert("Por favor, ingresa tu nombre y apellido para comenzar el quiz.");
+                input.focus();
+                return;
+            }
+            estudianteActual = nombre;
+            cursoActual = cursoSelect.value;
+            document.getElementById('seccion-nombre').classList.add('hidden');
+            document.getElementById('contenedor-preguntas').classList.remove('hidden');
+        }
+
+        function enviarQuiz() {
+            let puntaje = 0;
+            let respuestasEstudiante = [];
+            let detalleCorrectasPreguntas = new Array(10).fill(0);
+
+            for (let i = 0; i < preguntasQuiz.length; i++) {
+                let seleccionada = document.querySelector(`input[name="p_${i}"]:checked`);
+                let respIdx = seleccionada ? parseInt(seleccionada.value) : -1;
+                respuestasEstudiante.push(respIdx);
+                if (respIdx === preguntasQuiz[i].correcta) {
+                    puntaje++;
+                    detalleCorrectasPreguntas[i] = 1;
+                }
+            }
+
+            let registro = {
+                id: Date.now(),
+                nombre: estudianteActual,
+                curso: cursoActual,
+                puntaje: puntaje,
+                respuestas: respuestasEstudiante,
+                detalleCorrectas: detalleCorrectasPreguntas,
+                fecha: new Date().toLocaleString()
+            };
+
+            resultadosGuardados.push(registro);
+            localStorage.setItem('quiz_oa10_resultados', JSON.stringify(resultadosGuardados));
+
+            document.getElementById('contenedor-preguntas').classList.add('hidden');
+            const resDiv = document.getElementById('resultado-quiz');
+            resDiv.classList.remove('hidden');
+            document.getElementById('texto-puntaje').innerHTML = `¡Buen trabajo, <strong>${estudianteActual}</strong> (${cursoActual})! Has obtenido <strong>${puntaje} de 10</strong> respuestas correctas.`;
+        }
+
+        function reiniciarQuiz() {
+            document.getElementById('resultado-quiz').classList.add('hidden');
+            document.getElementById('seccion-nombre').classList.remove('hidden');
+            document.getElementById('nombre-estudiante').value = '';
+            renderQuiz();
+        }
+
+        function abrirModalDocente() {
+            document.getElementById('modal-docente').classList.remove('hidden');
+            document.getElementById('auth-docente').classList.remove('hidden');
+            document.getElementById('contenido-docente').classList.add('hidden');
+            document.getElementById('input-clave-docente').value = '';
+        }
+
+        function cerrarModalDocente() {
+            document.getElementById('modal-docente').classList.add('hidden');
+        }
+
+        function verificarClaveDocente() {
+            const clave = document.getElementById('input-clave-docente').value;
+            if (clave === '142857') {
+                esModoDocente = true;
+                actualizarBotonSiguiente();
+                actualizarDisplayReloj();
+                document.getElementById('auth-docente').classList.add('hidden');
+                document.getElementById('contenido-docente').classList.remove('hidden');
+                actualizarPanelDocente();
+            } else {
+                alert("Clave incorrecta.");
+            }
+        }
+
+        function actualizarPanelDocente() {
+            let filtroCurso = document.getElementById('filtro-curso-docente').value;
+            let resultadosFiltrados = resultadosGuardados;
+            if (filtroCurso !== 'TODOS') {
+                resultadosFiltrados = resultadosGuardados.filter(r => r.curso === filtroCurso);
+            }
+
+            document.getElementById('stat-total-estudiantes').textContent = resultadosFiltrados.length;
+            let sumaPuntajes = resultadosFiltrados.reduce((acc, curr) => acc + curr.puntaje, 0);
+            let promedio = resultadosFiltrados.length > 0 ? (sumaPuntajes / resultadosFiltrados.length).toFixed(1) : 0;
+            document.getElementById('stat-promedio').textContent = `${promedio} / 10`;
+
+            const tbody = document.getElementById('tabla-estudiantes-body');
+            tbody.innerHTML = '';
+            if (resultadosFiltrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Aún no hay registros de estudiantes para este filtro.</td></tr>`;
+            } else {
+                resultadosFiltrados.forEach(r => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="p-3 font-semibold text-indigo-300">${r.nombre}</td>
+                        <td class="p-3 text-slate-200 font-medium">${r.curso || '2° Medio A'}</td>
+                        <td class="p-3 text-emerald-400 font-bold">${r.puntaje} / 10</td>
+                        <td class="p-3 text-slate-300">${r.fecha}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="eliminarResultadoIndividual(${r.id})" class="bg-rose-600/25 hover:bg-rose-600 text-rose-300 hover:text-white px-3 py-1 rounded text-sm transition">Eliminar</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            renderGraficosDocente(resultadosFiltrados);
+        }
+
+        function eliminarResultadoIndividual(id) {
+            if (confirm("¿Estás seguro de que deseas eliminar el registro de este estudiante?")) {
+                resultadosGuardados = resultadosGuardados.filter(r => r.id !== id);
+                localStorage.setItem('quiz_oa10_resultados', JSON.stringify(resultadosGuardados));
+                actualizarPanelDocente();
+            }
+        }
+
+        let graficoTotalesInstancia = null;
+        let graficoPreguntasInstancia = null;
+
+        function renderGraficosDocente(datosFiltrados) {
+            let distribucionPuntajes = new Array(11).fill(0);
+            datosFiltrados.forEach(r => { distribucionPuntajes[r.puntaje]++; });
+
+            const ctxTotales = document.getElementById('graficoDocenteTotales').getContext('2d');
+            if (graficoTotalesInstancia instanceof Chart) graficoTotalesInstancia.destroy();
+
+            graficoTotalesInstancia = new Chart(ctxTotales, {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length: 11}, (_, i) => `${i} pts`),
+                    datasets: [{
+                        label: 'N° de Estudiantes',
+                        data: distribucionPuntajes,
+                        backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            let porcentajeAciertosPreguntas = new Array(10).fill(0);
+            if (datosFiltrados.length > 0) {
+                for (let p = 0; p < 10; p++) {
+                    let correctasP = datosFiltrados.reduce((acc, curr) => acc + (curr.detalleCorrectas[p] || 0), 0);
+                    porcentajeAciertosPreguntas[p] = Math.round((correctasP / datosFiltrados.length) * 100);
+                }
+            }
+
+            const ctxPreguntas = document.getElementById('graficoDocentePreguntas').getContext('2d');
+            if (graficoPreguntasInstancia instanceof Chart) graficoPreguntasInstancia.destroy();
+
+            graficoPreguntasInstancia = new Chart(ctxPreguntas, {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length: 10}, (_, i) => `P${i+1}`),
+                    datasets: [{
+                        label: '% Aciertos',
+                        data: porcentajeAciertosPreguntas,
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { color: '#94a3b8', callback: (v) => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function exportarCSV() {
+            if (resultadosGuardados.length === 0) {
+                alert("No hay registros para exportar.");
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,Estudiante,Curso,Puntaje,Fecha\n";
+            resultadosGuardados.forEach(r => {
+                csvContent += `"${r.nombre}","${r.curso || '2° Medio A'}",${r.puntaje},"${r.fecha}"\n`;
+            });
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "resultados_quiz_oa10.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function actualizarGrafico() {
+            const canvasEl = document.getElementById('graficoProbabilidad');
+            if(!canvasEl) return;
+            const ctx = canvasEl.getContext('2d');
+            let labels = [];
+            let dataEmpirica = [];
+            let dataTeorica = [];
+
+            if (currentTab === 'experimentos') {
+                if (currentSubExp === 'monedas') {
+                    labels = Array.from({length: nMonedas + 1}, (_, i) => `X = ${i}`);
+                    let total = Object.values(freqMonedas).reduce((a, b) => a + b, 0);
+                    dataEmpirica = labels.map((_, i) => total > 0 ? (freqMonedas[i] / total) : 0);
+                    dataTeorica = labels.map((_, i) => probabilidadTeoricaMonedas(i, nMonedas));
+                } else if (currentSubExp === 'dados') {
+                    labels = Array.from({length: (nDados * 6) - nDados + 1}, (_, i) => `X = ${i + nDados}`);
+                    let total = Object.values(freqDados).reduce((a, b) => a + b, 0);
+                    dataEmpirica = labels.map((_, i) => total > 0 ? ((freqDados[i + nDados] || 0) / total) : 0);
+                    dataTeorica = labels.map((_, i) => (cacheProbDados[i + nDados] || { prob: 0 }).prob);
+                } else if (currentSubExp === 'urnas') {
+                    labels = ['X = 0', 'X = 1', 'X = 2'];
+                    let total = Object.values(freqUrnas).reduce((a, b) => a + b, 0);
+                    dataEmpirica = labels.map((_, i) => total > 0 ? (freqUrnas[i] / total) : 0);
+                    dataTeorica = labels.map((_, i) => probabilidadTeoricaUrnas(i));
+                }
+            }
+
+            if (window.miGrafico instanceof Chart) window.miGrafico.destroy();
+
+            window.miGrafico = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Frec. Relativa (Empírica)', data: dataEmpirica, backgroundColor: 'rgba(99, 102, 241, 0.7)', borderColor: 'rgba(99, 102, 241, 1)', borderWidth: 1 },
+                        { label: 'Prob. Teórica \\(P(X=x)\\)', data: dataTeorica, type: 'line', borderColor: 'rgba(16, 185, 129, 1)', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 1, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: { legend: { labels: { color: '#f8fafc', font: { size: 14 } } } }
+                }
+            });
+        }
+
+        function actualizarGuiaAnalisis() {
+            const contenedor = document.getElementById('guia-contenido');
+            if(!contenedor) return;
+            if (currentTab === 'inicio') {
+                contenedor.innerHTML = `<div><strong class="text-indigo-300">Inicio de Unidad:</strong><br>Completa el termómetro, responde las 5 preguntas del ticket de entrada y conversa con el tutor IA para prepararte.</div>`;
+            } else if (currentTab === 'introduccion') {
+                contenedor.innerHTML = `<div><strong class="text-indigo-300">Contextualización:</strong><br>Analiza los fundamentos teóricos, la regla de Laplace, interactúa con los retos de urnas y dados, y revisa la ley de grandes números.</div>`;
+            } else if (currentTab === 'experimentos') {
+                if (currentSubExp === 'monedas') {
+                    contenedor.innerHTML = `<div><strong class="text-indigo-300">Monedas:</strong><br>Estudia la variable aleatoria \(X\) de caras en \(n\) monedas honestas.</div>`;
+                } else if (currentSubExp === 'dados') {
+                    contenedor.innerHTML = `<div><strong class="text-emerald-300">Dados:</strong><br>Observa la distribución simétrica de la suma de puntos en dados.</div>`;
+                } else if (currentSubExp === 'urnas') {
+                    contenedor.innerHTML = `<div><strong class="text-amber-300">Urnas:</strong><br>Analiza extracciones con restitución y sus probabilidades teóricas al cambiar colores.</div>`;
+                }
+            } else if (currentTab === 'quiz') {
+                contenedor.innerHTML = `<div><strong class="text-indigo-300">Quiz Final:</strong><br>Responde la evaluación sumativa de 10 preguntas.</div>`;
+            }
+        }
+
+        // CHATBOX IA AMPLIADO Y MEJORADO PARA RESPONDER A TODO LO RELATIVO AL CONTENIDO MATEMÁTICO
+        function enviarMensajeChat() {
+            const input = document.getElementById('chat-input');
+            const texto = input.value.trim();
+            if (!texto) return;
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML += `<div class="bg-slate-800 p-3 rounded-lg text-slate-200 text-right"><strong>Tú:</strong> ${texto}</div>`;
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            setTimeout(() => {
+                let respuesta = "Entiendo tu consulta. En este laboratorio del OA 10 exploramos variables aleatorias finitas, probabilidad teórica y empírica. ¿Quieres consultar sobre primos, pares, monedas, dados o urnas?";
+                const t = texto.toLowerCase();
+
+                if (t.includes('primo') || t.includes('primos')) {
+                    respuesta = "Un <strong>número primo</strong> es aquel entero mayor que 1 que tiene únicamente dos divisores positivos distintos: él mismo y el 1. Ejemplos: \\(2, 3, 5, 7, 11, 13, 17, 19\\,...\\ Nota que el 1 <strong>no</strong> es primo. En un dado de 6 caras, los números primos son \\(2, 3\\) y \\(5\\), lo que resulta en una probabilidad teórica de \\(\\frac{3}{6} = \\frac{1}{2}\\).";
+                } else if (t.includes('par') || t.includes('pares') || t.includes('impar') || t.includes('impares')) {
+                    respuesta = "Los <strong>números pares</strong> son múltiplos de 2 (terminan en 0, 2, 4, 6, 8; ej: \\(2, 4, 6, 8, 10\\,...\\)). Los <strong>impares</strong> no son divisibles por 2 (ej: \\(1, 3, 5, 7, 9\\,...\\)). En un dado de 6 caras, hay 3 números pares \\(\\{2, 4, 6\\}\\) y 3 impares \\(\\{1, 3, 5\\}\\).";
+                } else if (t.includes('equiprobable') || t.includes('equiprobabilidad')) {
+                    respuesta = "Se dice que los resultados son <strong>equiprobables</strong> cuando todos tienen exactamente la misma oportunidad de ocurrir.";
+                } else if (t.includes('moneda') || t.includes('dado') || t.includes('honesta')) {
+                    respuesta = "Una moneda o dado <strong>honesto</strong> es aquel que no está cargado; cada resultado posible posee idéntica probabilidad de ocurrencia.";
+                } else if (t.includes('variable aleatoria')) {
+                    respuesta = "Una <strong>variable aleatoria</strong> es una función matemática que asigna un número real a cada resultado de un experimento aleatorio (por ejemplo, contar cuántas caras salen o sumar puntos de dados).";
+                } else if (t.includes('ley de los grandes numeros')) {
+                    respuesta = "La <strong>Ley de los Grandes Números</strong> indica que al aumentar el número de ensayos o simulaciones, la frecuencia relativa converge de manera estable hacia la probabilidad teórica.";
+                } else if (t.includes('laplace') || t.includes('calcular') || t.includes('formula') || t.includes('fraccion')) {
+                    respuesta = "La <strong>Regla de Laplace</strong> establece que \\(P(A) = \\frac{\\text{Casos Favorables}}{\\text{Casos Totales Posibles}}\\_, aplicable cuando el espacio muestral es finito y equiprobable.";
+                } else if (t.includes('urna') || t.includes('bola') || t.includes('bolas') || t.includes('color')) {
+                    respuesta = "En el experimento de <strong>urnas</strong>, modelamos la extracción con restitución. Al cambiar la cantidad de colores o la proporción de bolas, la distribución de probabilidad teórica de la variable aleatoria \\(X\\) se recalcula automáticamente.";
+                } else if (t.includes('hola') || t.includes('necesito') || t.includes('clase') || t.includes('día')) {
+                    respuesta = "¡Hola! Estoy completamente preparado para ayudarte con cualquier contenido de matemática escolar: números primos, pares, impares, probabilidad, fracciones, combinatoria y el uso de los simuladores del laboratorio OA 10.";
+                } else {
+                    respuesta = `Entiendo tu consulta sobre "<strong>${texto}</strong>". En este laboratorio trabajamos con elementos de matemática discreta, teoría de números y probabilidad. Recuerda que puedes consultar sobre números primos, pares, dados, monedas o urnas. ¿Te gustaría que profundicemos en algún cálculo específico?`;
+                }
+
+                chatMessages.innerHTML += `<div class="bg-indigo-950/60 border border-indigo-500/30 p-3 rounded-lg text-indigo-200"><strong>Tutor IA:</strong> ${respuesta}</div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                if (window.MathJax) MathJax.typesetPromise();
+            }, 600);
+        }
+    </script>
+</body>
+</html>
